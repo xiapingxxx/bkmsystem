@@ -14,7 +14,7 @@ function generateRoutes(menus) {
     const adminSymbol = Symbol(item.menu_id)
     router.addRoute({
       name: item.menu_id,
-      path: item.children.length > 0 ? item.path : '/',
+      path: '/',
       component: layout,
       meta: {
         title: item.menu_name,
@@ -45,6 +45,7 @@ function generateRoutes(menus) {
       })
     }
   })
+  // console.log(menus)
   // console.log(router.getRoutes())
 }
 

@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/modules/user'
 import { useTagsStore } from '@/stores/modules/tags'
 import { usePermissionStore } from '@/stores/modules/permission'
 import layout from '@/layout/IndexView.vue'
+import { RouterView } from 'vue-router'
 import { useRouter } from 'vue-router'
 
 const whiteList = ['/login']
@@ -11,7 +12,7 @@ const modules = import.meta.glob('/src/views/**/*.vue')
 function generateRoutes(menus) {
   menus.forEach((item) => {
     if (item.path === '/home') return
-    const adminSymbol = Symbol(item.menu_id)
+
     router.addRoute({
       name: item.menu_id,
       path: '/',
@@ -24,7 +25,7 @@ function generateRoutes(menus) {
     if (item.menu_type === 2) {
       router.addRoute(item.menu_id, {
         path: item.path,
-        name: adminSymbol,
+        name: `menu-${item.menu_id}`,
         component: modules[`/src/views${item.component_path}/IndexView.vue`],
         meta: {
           title: item.menu_name,

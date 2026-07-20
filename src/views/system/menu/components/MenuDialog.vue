@@ -174,12 +174,12 @@ const submitForm = async () => {
       console.log('提交失败', fields)
       return
     }
-    if (!form.value.path.startsWith('/')) {
-      form.value.path = `/${form.value.path}`
-    }
-    if (!form.value.component_path.startsWith('/')) {
-      form.value.component_path = `/${form.value.component_path}`
-    }
+    // if (!form.value.path?.startsWith('/')) {
+    //   form.value.path = `/${form.value.path}`
+    // }
+    // if (!form.value.component_path?.startsWith('/')) {
+    //   form.value.component_path = `/${form.value.component_path}`
+    // }
     if (props.mode === 'add') {
       await addMenu(form.value)
     } else {

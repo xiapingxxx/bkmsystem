@@ -1,19 +1,17 @@
 import router from '@/router/index.js'
 import { useUserStore } from '@/stores/modules/user'
 import { useTagsStore } from '@/stores/modules/tags'
-import { usePermissionStore } from '@/stores/modules/permission'
+import { useRouteStore } from '@/stores/modules/route'
 import layout from '@/layout/IndexView.vue'
-import { RouterView } from 'vue-router'
-import { useRouter } from 'vue-router'
 
 const whiteList = ['/login']
 const modules = import.meta.glob('/src/views/**/*.vue')
 
-function generateRoutes(menus) {
+function generateRoutes(menus, routeStore) {
   menus.forEach((item) => {
     if (item.path === '/home') return
 
-    router.addRoute({
+    const removeRoute = router.addRoute({
       name: item.menu_id,
       path: '/',
       component: layout,
@@ -22,8 +20,9 @@ function generateRoutes(menus) {
         clickAble: item.menu_type === 1 ? false : true,
       },
     })
+    routeStore.addRemoveRouteFn(removeRoute)
     if (item.menu_type === 2) {
-      router.addRoute(item.menu_id, {
+      const removeRoute = router.addRoute(item.menu_id, {
         path: item.path,
         name: `menu-${item.menu_id}`,
         component: modules[`/src/views${item.component_path}/IndexView.vue`],
@@ -32,9 +31,10 @@ function generateRoutes(menus) {
           keepAlive: true,
         },
       })
+      routeStore.addRemoveRouteFn(removeRoute)
     } else if (item.menu_type === 1 && Array.isArray(item.children) && item.children.length > 0) {
       item.children.forEach((child) => {
-        router.addRoute(item.menu_id, {
+        const removeRoute = router.addRoute(item.menu_id, {
           path: child.path,
           name: child.menu_id,
           component: modules[`/src/views${child.component_path}/IndexView.vue`],
@@ -43,6 +43,7 @@ function generateRoutes(menus) {
             keepAlive: true,
           },
         })
+        routeStore.addRemoveRouteFn(removeRoute)
       })
     }
   })
@@ -52,15 +53,15 @@ function generateRoutes(menus) {
 
 router.beforeEach((to, from) => {
   const userStore = useUserStore()
-  const permissionStore = usePermissionStore()
+  const routeStore = useRouteStore()
   const token = userStore.token
-  const router = useRouter()
+
   document.title = to.meta?.title || '后台管理系统'
 
   if (token) {
-    if (userStore.menus.length && !permissionStore.routesLoaded) {
-      generateRoutes(userStore.menus)
-      permissionStore.routesLoaded = true
+    if (userStore.menus.length && !routeStore.routesLoaded) {
+      generateRoutes(userStore.menus, routeStore)
+      routeStore.routesLoaded = true
 
       return {
         ...to,
@@ -83,12 +84,9 @@ router.beforeEach((to, from) => {
 
 router.afterEach((to, from, failure) => {
   const tagsStore = useTagsStore()
-  if (to.path === '/login') {
-    tagsStore.logout()
-    return
-  }
+
   if (tagsStore.tags.some((item) => item.path === to.path)) return
-  if (to.path === '/home') return
+  if (['/home', '/login'].includes(to.path)) return
 
   tagsStore.addTags({
     title: to.meta.title,

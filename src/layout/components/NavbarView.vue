@@ -54,8 +54,12 @@ import { Expand, Search, FullScreen, Bell, ArrowDown } from '@element-plus/icons
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/modules/user'
+import { useTagsStore } from '@/stores/modules/tags'
+import { useRouteStore } from '@/stores/modules/route'
 
 const userStore = useUserStore()
+const tagsStore = useTagsStore()
+const routeStore = useRouteStore()
 
 const route = useRoute()
 const router = useRouter()
@@ -73,9 +77,12 @@ const handleDropDown = () => {
   dropDownRef.value.handleOpen()
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
   userStore.logout()
-  router.push('/login')
+  tagsStore.logout()
+  routeStore.clearDynamicRoutes()
+
+  await router.replace('/login')
 }
 </script>
 

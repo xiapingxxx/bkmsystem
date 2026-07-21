@@ -15,4 +15,5 @@ export const useTagsStore = defineStore('tags', {
       this.$reset()
     },
   },
+  persist: true,
 })

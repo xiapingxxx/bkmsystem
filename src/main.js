@@ -16,9 +16,8 @@ import { hasPermission } from '@/utils/vpermission'
 async function bootstrap() {
   if (import.meta.env.PROD) {
     // 生产环境加载 mock
-    import('../mockProdServer.js').then(({ setupProdMockServer }) => {
-      setupProdMockServer()
-    })
+    const { setupProdMockServer } = await import('../mockProdServer.js')
+    setupProdMockServer()
   }
 
   const app = createApp(App)

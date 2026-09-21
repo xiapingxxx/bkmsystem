@@ -13,29 +13,33 @@ import 'element-plus/dist/index.css'
 import '@/router/permission'
 import { hasPermission } from '@/utils/vpermission'
 
-if (import.meta.env.PROD) {
-  // 生产环境加载 mock
-  import('../mockProdServer.js').then(({ setupProdMockServer }) => {
-    setupProdMockServer()
+async function bootstrap() {
+  if (import.meta.env.PROD) {
+    // 生产环境加载 mock
+    import('../mockProdServer.js').then(({ setupProdMockServer }) => {
+      setupProdMockServer()
+    })
+  }
+
+  const app = createApp(App)
+
+  app.use(pinia)
+  app.use(router)
+
+  app.use(ElementPlus, {
+    locale: zhCn,
   })
+
+  app.directive('permission', {
+    mounted(el, binding) {
+      const permission = binding.value
+      if (!hasPermission(permission)) {
+        el.parentNode?.removeChild(el)
+      }
+    },
+  })
+
+  app.mount('#app')
 }
 
-const app = createApp(App)
-
-app.use(pinia)
-app.use(router)
-
-app.use(ElementPlus, {
-  locale: zhCn,
-})
-
-app.directive('permission', {
-  mounted(el, binding) {
-    const permission = binding.value
-    if (!hasPermission(permission)) {
-      el.parentNode?.removeChild(el)
-    }
-  },
-})
-
-app.mount('#app')
+bootstrap()

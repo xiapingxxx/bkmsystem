@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
         // `,
       }),
     ],
-    base: '/htglSystem/',
+    base: '/bkmsystem/',
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
